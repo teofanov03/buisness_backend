@@ -3,13 +3,9 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import Message from "../models/Message";
 
-
 dotenv.config();
 
-
-
-
-// NOVO: GET ruta - dohvatanje svih poruka
+// GET: dohvatanje svih poruka
 export const getMessages = async (req: Request, res: Response) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 }); // najnovije prve
@@ -20,15 +16,13 @@ export const getMessages = async (req: Request, res: Response) => {
   }
 };
 
-
-
-// Kreiranje nove poruke (POST)
+// POST: kreiranje nove poruke
 export const createMessage = async (req: Request, res: Response) => {
   try {
     const { name, email, message } = req.body;
 
-    // Sačuvaj poruku u bazi
-    const newMsg = new Message({ name, email, message });
+    // Sačuvaj poruku u bazi sa status 'unread'
+    const newMsg = new Message({ name, email, message, status: 'unread' });
     await newMsg.save();
 
     // Pošalji email
@@ -36,8 +30,8 @@ export const createMessage = async (req: Request, res: Response) => {
       service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
+        pass: process.env.EMAIL_PASS,
+      },
     });
 
     await transporter.sendMail({
@@ -49,13 +43,13 @@ export const createMessage = async (req: Request, res: Response) => {
         <p><b>Ime:</b> ${name}</p>
         <p><b>Email:</b> ${email}</p>
         <p><b>Poruka:</b><br>${message}</p>
-      `
+      `,
     });
 
     return res.status(201).json({
       success: true,
       message: "Poruka uspešno poslata i sačuvana!",
-      data: newMsg
+      data: newMsg,
     });
   } catch (error) {
     console.error(error);
@@ -63,7 +57,7 @@ export const createMessage = async (req: Request, res: Response) => {
   }
 };
 
-// Brisanje poruke (DELETE)
+// DELETE: brisanje poruke
 export const deleteMessage = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -73,41 +67,41 @@ export const deleteMessage = async (req: Request, res: Response) => {
     if (!msg) {
       return res.status(404).json({
         success: false,
-        message: "Poruka nije pronađena"
+        message: "Poruka nije pronađena",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Poruka obrisana"
+      message: "Poruka obrisana",
     });
   } catch (error) {
     return res.status(500).json({ success: false, error });
   }
 };
 
-// Označi kao pročitano (PUT)
+// PUT: označi poruku kao pročitanu
 export const markAsRead = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
     const msg = await Message.findByIdAndUpdate(
       id,
-      { read: true },
+      { status: 'read' },
       { new: true }
     );
 
     if (!msg) {
       return res.status(404).json({
         success: false,
-        message: "Poruka nije pronađena"
+        message: "Poruka nije pronađena",
       });
     }
 
     return res.status(200).json({
       success: true,
       message: "Poruka označena kao pročitana",
-      data: msg
+      data: msg,
     });
   } catch (error) {
     return res.status(500).json({ success: false, error });
