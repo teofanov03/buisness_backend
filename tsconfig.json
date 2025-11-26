@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    // Target i module za Node.js
+    "target": "ES2020",
+    "module": "commonjs",
+
+    // Omogućava import Express-a i drugih CommonJS modula koristeći `import express from "express";`
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+
+    // Output folder
+    "outDir": "./dist",
+    "rootDir": "./",
+
+    // Source maps za debugging
+    "sourceMap": true,
+
+    // Ostale preporuke
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "isolatedModules": true
+  },
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
