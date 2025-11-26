@@ -26,14 +26,30 @@ mongoose.connect(process.env.MONGO_URI || "")
     }
   })
   .catch(err => console.error("MongoDB greška:", err));
- 
-
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// **CORS setup**
+app.use(cors({
+  origin: [
+    'http://localhost:3000',                // lokalni frontend
+    'https://tvoj-frontend.vercel.app'      // live frontend (promeni na pravi URL)
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
+
+// Ovo dozvoljava preflight OPTIONS request
+app.options('*', cors({
+  origin: [
+    'http://localhost:3000',
+    'https://tvoj-frontend.vercel.app'
+  ],
+  credentials: true
+}));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use("/api/contact", contactRoutes);
 app.use("/api/auth", authRoutes);
