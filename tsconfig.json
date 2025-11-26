@@ -8,11 +8,8 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./",
-    "sourceMap": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "isolatedModules": true
+    "sourceMap": true
   },
-  "include": ["**/*.ts"],
+  "include": ["*.ts", "routes/**/*.ts", "models/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
