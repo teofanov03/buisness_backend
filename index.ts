@@ -36,19 +36,7 @@ app.use(cors({
   credentials: true,
 }));
 
-// 2. ULTIMATE FIX: Middleware to handle OPTIONS preflight requests
-// This intercepts any remaining OPTIONS requests that CORS middleware or Vercel missed
-app.use((req, res, next) => {
-    if (req.method === 'OPTIONS') {
-        // Ensure necessary headers are manually set for the preflight
-        res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type, Accept');
-        res.header('Access-Control-Allow-Credentials', 'true');
-        return res.status(200).send();
-    }
-    next();
-});
+
 
 // --- END: Comprehensive CORS Configuration ---
 
