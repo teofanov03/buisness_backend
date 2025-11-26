@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-      "dev": "ts-node-dev --respawn --transpile-only index.ts",
-      "start": "ts-node index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only index.ts",
+    "start": "ts-node index.ts"
   },
   "keywords": [],
   "author": "",
