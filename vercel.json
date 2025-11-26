@@ -1,15 +1,29 @@
 {
   "headers": [
     {
+      
       "source": "/api/(.*)",
+      "has": [{ "type": "header", "key": "Access-Control-Request-Method", "value": "OPTIONS" }],
       "headers": [
         { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        
-        { "key": "Access-Control-Allow-Origin", "value": "*" }, 
-        
+        { "key": "Access-Control-Allow-Origin", "value": "http://localhost:3000" }, 
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Authorization, Content-Type, Accept" }
+        { "key": "Access-Control-Allow-Headers", "value": "Authorization, Content-Type, Accept, *" } 
       ]
+    },
+    {
+      
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "http://localhost:3000" },
+        { "key": "Access-Control-Allow-Credentials", "value": "true" }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/index" 
     }
   ]
 }
