@@ -1,5 +1,3 @@
-// index.ts
-
 import express from "express";
 import contactRoutes from "./routes/contactRoutes";
 import authRoutes from "./routes/authRoutes";
@@ -7,44 +5,54 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import User from "./models/User";
 import bcrypt from "bcryptjs";
-import cors from "cors"; // We still use this for the main response
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
 
-// --- START: Comprehensive CORS Configuration ---
-
+// **CORS middleware za serverless**
 const allowedOrigins = [
-    "http://localhost:3000", 
-    // Add your deployed frontend URL here when it's live
-    "https://tvoj-live-frontend.vercel.app" 
+    "http://localhost:3000", 
+    // IMPORTANT: Replace this with the live URL of your frontend when you deploy it
+    "https://tvoj-live-frontend.vercel.app" 
 ];
 
-// 1. CORS Middleware for main requests (GET, POST, etc.)
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allows requests with no origin (like Postman or cURL)
-    if (!origin) return callback(null, true); 
-    if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-        return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-},
+  origin: allowedOrigins, // Use the array for simple checking
   methods: ["GET","POST","PUT","DELETE","OPTIONS"],
   credentials: true,
 }));
 
-
-
-// --- END: Comprehensive CORS Configuration ---
-
 // JSON middleware
 app.use(express.json());
 
-// ... (rest of the file remains the same)
-
 // MongoDB konekcija i kreiranje default admina
 mongoose.connect(process.env.MONGO_URI || "")
-// ... (rest of the file)
+  .then(async () => {
+    console.log("MongoDB povezan");
+
+    const admin = await User.findOne({ username: "admin" });
+    if (!admin) {
+      const hashed = await bcrypt.hash("admin123", 10);
+      await User.create({
+        username: "admin",
+        password: hashed,
+        role: "admin"
+      });
+      console.log("Default admin kreiran: admin / admin123");
+    }
+  })
+  .catch(err => console.error("MongoDB greška:", err));
+
+// Rute
+app.use("/api/contact", contactRoutes);
+app.use("/api/auth", authRoutes);
+
+// Test ruta
+app.get("/", (req, res) => {
+  res.send("Backend radi!");
+});
+
+// **FIX: Replace 'export default app;' with 'module.exports = app;'**
+module.exports = app;
