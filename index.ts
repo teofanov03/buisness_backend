@@ -12,10 +12,16 @@ dotenv.config();
 const app = express();
 
 // **CORS middleware za serverless**
+const allowedOrigins = [
+    "http://localhost:3000", 
+    // IMPORTANT: Replace this with the live URL of your frontend when you deploy it
+    "https://tvoj-live-frontend.vercel.app" 
+];
+
 app.use(cors({
-  origin: ["http://localhost:3000", "https://tvoj-live-frontend.vercel.app"], // dodaj URL svog frontend-a
-  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
-  credentials: true,
+  origin: allowedOrigins, // Use the array for simple checking
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  credentials: true,
 }));
 
 // JSON middleware
