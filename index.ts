@@ -10,33 +10,16 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Middleware za JSON
-app.use(express.json());
-
-// CORS middleware
-const allowedOrigins = [
-  "http://localhost:3000", 
-  "https://tvoj-live-frontend.vercel.app" // zameni sa tvojim frontend URL-om
-];
-
+// **CORS middleware za serverless**
 app.use(cors({
-  origin: (origin, callback) => {
-    // Dozvoli requests bez origin (npr. Postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error("CORS policy: Origin not allowed"));
-    }
-  },
+  origin: ["http://localhost:3000", "https://tvoj-live-frontend.vercel.app"], // dodaj URL svog frontend-a
   methods: ["GET","POST","PUT","DELETE","OPTIONS"],
-  credentials: true
+  credentials: true,
 }));
 
-// Preflight OPTIONS (nije obavezno, ali sigurno)
-app.options("*", cors());
+// JSON middleware
+app.use(express.json());
 
 // MongoDB konekcija i kreiranje default admina
 mongoose.connect(process.env.MONGO_URI || "")
@@ -49,7 +32,7 @@ mongoose.connect(process.env.MONGO_URI || "")
       await User.create({
         username: "admin",
         password: hashed,
-        role: "admin",
+        role: "admin"
       });
       console.log("Default admin kreiran: admin / admin123");
     }
@@ -65,12 +48,5 @@ app.get("/", (req, res) => {
   res.send("Backend radi!");
 });
 
-// Pokretanje servera lokalno
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`Server pokrenut na portu ${PORT}`);
-  });
-}
-
-// Export za Vercel serverless
+// **Ne koristiti app.listen() na Vercel serverless**
 export default app;
