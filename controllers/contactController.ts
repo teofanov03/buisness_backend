@@ -20,37 +20,37 @@ export const getMessages = async (req: Request, res: Response) => {
 export const createMessage = async (req: Request, res: Response) => {
   try {
     const { name, email, message } = req.body;
-    console.log("LOG 1: Request body received and validated.");
+    
 
     // Sačuvaj poruku u bazi sa status 'unread'
     const newMsg = new Message({ name, email, message, status: 'unread' });
     await newMsg.save();
-    console.log("LOG 2: Database message saved successfully.");
+    console.log("LOG: Message saved. EMAIL STEP SKIPPED.");
     // Pošalji email
-    const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com", 
-    port: 587, 
-    secure: false, 
-    requireTLS: true, 
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-    timeout: 5000,
-} as any);
-    console.log("LOG 3: Nodemailer transporter created. Attempting email send...");
-    await transporter.sendMail({
-      from: `"Business Website" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
-      subject: "Novi upit sa sajta",
-      html: `
-        <h3>Novi upit sa sajta</h3>
-        <p><b>Ime:</b> ${name}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Poruka:</b><br>${message}</p>
-      `,
-    });
-    console.log("LOG 4: Email sent (or successfully handed off). Sending success response.");
+//     const transporter = nodemailer.createTransport({
+//     host: "smtp.gmail.com", 
+//     port: 587, 
+//     secure: false, 
+//     requireTLS: true, 
+//     auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS,
+//     },
+//     timeout: 5000,
+// } as any);
+
+    // await transporter.sendMail({
+    //   from: `"Business Website" <${process.env.EMAIL_USER}>`,
+    //   to: process.env.EMAIL_USER,
+    //   subject: "Novi upit sa sajta",
+    //   html: `
+    //     <h3>Novi upit sa sajta</h3>
+    //     <p><b>Ime:</b> ${name}</p>
+    //     <p><b>Email:</b> ${email}</p>
+    //     <p><b>Poruka:</b><br>${message}</p>
+    //   `,
+    // });
+    
 
     return res.status(201).json({
       success: true,
