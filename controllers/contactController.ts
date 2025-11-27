@@ -51,9 +51,11 @@ export const createMessage = async (req: Request, res: Response) => {
       message: "Poruka uspešno poslata i sačuvana!",
       data: newMsg,
     });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, error });
+  }catch (error: any) { // Make sure to type 'error' as 'any' or 'NodemailerError'
+    console.error("--- EMAIL FAILED TO SEND ---");
+    console.error("Error cause/code:", error.code || 'N/A');
+    console.error("Error response:", error.response || 'N/A');
+    console.error("Full error object:", error);
   }
 };
 
