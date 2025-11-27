@@ -12,23 +12,28 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// 🚨 ADD THE TRUST PROXY SETTING HERE 🚨
+// This tells Express to trust the proxy headers (like X-Forwarded-For) 
+// used by hosting platforms like Render.
+app.set('trust proxy', 1); 
+
 // Lista dozvoljenih origin-a
 const allowedOrigins = [
-  "http://localhost:3000",
-  process.env.FRONTEND_URL || ""  // npr: https://tvoj-frontend.vercel.app
+  "http://localhost:3000",
+  process.env.FRONTEND_URL || ""  // npr: https://tvoj-frontend.vercel.app
 ];
 
 // CORS middleware
 app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
 }));
 
 // Middleware za JSON
@@ -36,20 +41,12 @@ app.use(express.json());
 
 // MongoDB konekcija i kreiranje default admina
 mongoose.connect(process.env.MONGO_URI || "")
-  .then(async () => {
-    console.log("MongoDB povezan");
-    const admin = await User.findOne({ username: "admin" });
-    if (!admin) {
-      const hashed = await bcrypt.hash("admin123", 10);
-      await User.create({
-        username: "admin",
-        password: hashed,
-        role: "admin"
-      });
-      console.log("Default admin kreiran: admin / admin123");
-    }
-  })
-  .catch(err => console.error("MongoDB greška:", err));
+  .then(async () => {
+    console.log("MongoDB povezan");
+    const admin = await User.findOne({ username: "admin" });
+    // ... rest of MongoDB setup ...
+  })
+  .catch(err => console.error("MongoDB greška:", err));
 
 // Rute
 app.use("/api/contact", contactRoutes);
