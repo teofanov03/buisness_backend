@@ -27,13 +27,16 @@ export const createMessage = async (req: Request, res: Response) => {
 
     // Pošalji email
     const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
+    host: "smtp.gmail.com", 
+    port: 587, 
+    secure: false, 
+    requireTLS: true, 
+    auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
-      },
-    });
-
+    },
+    timeout: 5000,
+} as any);
     await transporter.sendMail({
       from: `"Business Website" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
