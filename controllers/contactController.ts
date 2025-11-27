@@ -19,49 +19,23 @@ export const getMessages = async (req: Request, res: Response) => {
 };
 
 // --- POST: kreiranje nove poruke ---
-export const createMessage = async (req: Request, res: Response) => {
-  try {
-    const { name, email, company, message } = req.body; 
+ export const createMessage = async (req: Request, res: Response) => {
+    // 🛑 DUMP ENTIRE ENVIRONMENT FOR DEBUGGING 🛑
+    // This will send all environment variables set on Render to your browser.
+    // DANGER: Do not run this code in a production environment with sensitive keys!
+    
+    const env_info = {
+        EMAIL_USER_VALUE: process.env.EMAIL_USER,
+        SENDER_EMAIL_VALUE: process.env.SENDER_EMAIL,
+        ALL_KEYS: Object.keys(process.env).sort(), // List all keys available
+    };
 
-    // 1. Save the message to the database
-    const newMsg = new Message({ name, email, message, status: 'unread' });
-    await newMsg.save();
-
-    // 2. Send email using SendGrid API
-    const msg = {
-  
-      to: process.env.ADMIN_EMAIL!, 
-
-      from: process.env.SENDER_EMAIL!, 
-      replyTo: email, 
-      subject: `Novi upit sa sajta od: ${name}`,
-      html: `
-        <h3>Novi upit sa sajta</h3>
-        <p><b>Ime:</b> ${name}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Kompanija:</b> ${company || 'N/A'}</p>
-        <p><b>Poruka:</b><br>${message}</p>
-      `,
-    };
-
-    await sgMail.send(msg); 
-
-    // 3. Return success response to the client (Only one final return)
-    return res.status(201).json({
-      success: true,
-      message: "Poruka uspešno poslata i sačuvana!",
-      data: newMsg,
-    });
-  } catch (error: any) {
-    // Log the SendGrid error details
-    console.error("SendGrid Email API Error:", error.response?.body || error); 
-    
-    // Return a 500 error to ensure the button clears on failure
-    return res.status(500).json({ 
-        success: false, 
-        message: "Message saved, but email notification failed. Check server logs." 
-    });
-  }
+    // Return the environment variables to the client
+    return res.status(200).json({
+        success: true,
+        message: "ENVIRONMENT DEBUG INFO RETURNED. CHECK CONSOLE.",
+        data: env_info,
+    });
 };
 
 // --- DELETE: brisanje poruke ---
