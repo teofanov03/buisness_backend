@@ -16,26 +16,46 @@ export const getMessages = async (req: Request, res: Response) => {
      console.error("Greška pri dohvatanju poruka:", error);
      return res.status(500).json({ message: "Došlo je do greške" });
   }
-};
+   // DANGER: Do not run this code in a production environment with sensitive keys!
+ };
 
 // --- POST: kreiranje nove poruke ---
- export const createMessage = async (req: Request, res: Response) => {
-    // 🛑 DUMP ENTIRE ENVIRONMENT FOR DEBUGGING 🛑
-    // This will send all environment variables set on Render to your browser.
-    // DANGER: Do not run this code in a production environment with sensitive keys!
-    
-    const env_info = {
-        EMAIL_USER_VALUE: process.env.EMAIL_USER,
-        SENDER_EMAIL_VALUE: process.env.SENDER_EMAIL,
-        ALL_KEYS: Object.keys(process.env).sort(), // List all keys available
-    };
+ // contactController.ts
+// ... imports and initial sgMail.setApiKey(process.env.SENDGRID_API_KEY || ''); ...
 
-    // Return the environment variables to the client
-    return res.status(200).json({
-        success: true,
-        message: "ENVIRONMENT DEBUG INFO RETURNED. CHECK CONSOLE.",
-        data: env_info,
-    });
+export const createMessage = async (req: Request, res: Response) => {
+  try {
+    const { name, email, company, message } = req.body; 
+
+    // 🚨 ADD FINAL SAFETY CHECK HERE 🚨
+    const recipientEmail = process.env.EMAIL_USER;
+    const senderEmail = process.env.SENDER_EMAIL;
+
+    if (!recipientEmail || !senderEmail) {
+        throw new Error(`Critical Environment Variable Missing: Recipient: ${recipientEmail}, Sender: ${senderEmail}`);
+    }
+
+    // 1. Save the message to the database
+    const newMsg = new Message({ name, email, message, status: 'unread' });
+    await newMsg.save();
+
+    // 2. Send email using SendGrid API
+    const msg = {
+      to: recipientEmail, // Use the variable checked above
+      from: senderEmail, // Use the variable checked above
+      replyTo: email, 
+      subject: `Novi upit sa sajta od: ${name}`,
+      html: `...`,
+    };
+
+    await sgMail.send(msg); 
+
+    // 3. Return success response
+    return res.status(201).json({ success: true, message: "Poruka uspešno poslata i sačuvana!" });
+  } catch (error: any) {
+    // ... error logging ...
+    return res.status(500).json({ success: false, message: "A critical error occurred." });
+  }
 };
 
 // --- DELETE: brisanje poruke ---
