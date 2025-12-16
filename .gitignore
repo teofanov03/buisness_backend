@@ -1,3 +1,29 @@
-node_modules
-dist
+# --- DEPENDENCIJE I PROJEKTNI ARTEFAKTI ---
+/node_modules
+/dist
+/build
+/coverage
+
+# --- TAJNE (KLJUČNE STVARI ZA SIGURNOST) ---
 .env
+.env.local
+.env.*.local
+
+# --- LOGOVI I PRIVREMENI PODACI ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# --- UREĐIVAČI I OS-SPECIFIČNI FAJLOVI ---
+# VS Code
+.vscode/
+
+# IDEs (IntelliJ, WebStorm, itd.)
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
